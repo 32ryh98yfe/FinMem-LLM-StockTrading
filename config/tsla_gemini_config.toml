@@ -1,14 +1,28 @@
+# 이 파일은 FinMem 에이전트의 시뮬레이션에 필요한 모든 설정을 정의합니다.
+# TOML(Tom's Obvious, Minimal Language) 형식을 사용합니다.
+
+# --- LLM 채팅 모델 설정 ---
 [chat]
+# 사용할 LLM 모델의 이름을 지정합니다. 이 파일은 Google의 Gemini Pro 모델을 사용하도록 설정되었습니다.
 model="gemini-pro"
+# LLM API 요청을 보낼 엔드포인트(주소)입니다.
 end_point = "https://us-central1-aiplatform.googleapis.com/v1/projects/elite-destiny-371016/locations/us-central1/publishers/google/models/gemini-pro:generateContent"
+# LLM에게 역할을 부여하는 시스템 메시지입니다.
 system_message = "You are a helpful assistant."
 
 
+# --- 시뮬레이션 일반 설정 ---
 [general]
+# 기억을 검색할 때 상위 몇 개의 관련성 높은 정보를 가져올지 결정합니다.
 top_k = 3
+# 에이전트의 고유 이름입니다. 체크포인트 저장 시 사용됩니다.
 agent_name = "agent_1"
+# 포트폴리오의 과거 성과를 평가할 때 며칠 전까지의 데이터를 볼 것인지 결정합니다.
 look_back_window_size = 7
+# 거래할 주식의 티커(종목 심볼)입니다.
 trading_symbol = "TSLA"
+# 에이전트의 '캐릭터' 또는 전문 분야를 설명하는 문자열입니다.
+# 이 내용은 LLM이 정보를 검색하고 판단하는 기준이 됩니다.
 character_string = '''
 You accumuate a lot of informaion of the following sectors so you are especially good at trading them:
 (1)Electric Vehicles (Automotive Sector).
@@ -23,32 +37,52 @@ From year 2021 to 2022 September, Tesla's continued growth and solid financial p
 '''
 
 
+# --- 텍스트 임베딩 모델 설정 ---
 [agent.agent_1.embedding.detail]
+# 텍스트를 벡터로 변환하는 데 사용할 임베딩 모델의 이름입니다.
 embedding_model = "text-embedding-ada-002"
+# 모델의 최대 컨텍스트 길이를 초과하는 긴 텍스트를 처리할 때 나눌 청크(조각)의 크기입니다.
 chunk_size=5000
+# 임베딩 진행률 표시 여부입니다.
 verbose=false
 
 
+# --- 기억 계층별 상세 설정 ---
+
+# [short]: 단기 기억에 대한 설정
 [short]
+# 새로운 기억의 초기 중요도 점수를 어떻게 설정할지 방식을 지정합니다 ('sample'은 확률 기반 샘플링).
 importance_score_initialization = "sample"
+# 시간 쇠퇴(decay) 효과에 대한 파라미터입니다.
+# recency_factor: 최신성 점수가 감소하는 속도를 조절합니다 (값이 작을수록 빠르게 감소).
+# importance_factor: 중요도 점수가 매일 감소하는 비율입니다 (1에 가까울수록 느리게 감소).
 decay_params = {recency_factor=3.0, importance_factor=0.92}
+# 점수가 이 임계값 아래로 떨어지면 기억에서 삭제됩니다.
 clean_up_threshold_dict = {recency_threshold=0.05, importance_threshold=5}
+# 중요도 점수가 이 값을 초과하면 '중기 기억'으로 이동(jump)합니다.
 jump_threshold_upper = 60
 
+# [mid]: 중기 기억에 대한 설정
 [mid]
+# 중요도 점수가 이 값 미만이면 '단기 기억'으로 이동(jump)합니다.
 jump_threshold_lower = 60
+# 중요도 점수가 이 값을 초과하면 '장기 기억'으로 이동(jump)합니다.
 jump_threshold_upper = 80 
 importance_score_initialization = "sample"
 decay_params = {recency_factor=90.0, importance_factor=0.967}
 clean_up_threshold_dict = {recency_threshold=0.05, importance_threshold=5}
 
+# [long]: 장기 기억에 대한 설정
 [long]
+# 중요도 점수가 이 값 미만이면 '중기 기억'으로 이동(jump)합니다.
 jump_threshold_lower = 80
 importance_score_initialization = "sample"
 decay_params = {recency_factor=365.0, importance_factor=0.988}
 clean_up_threshold_dict = {recency_threshold=0.05, importance_threshold=5}
 
+# [reflection]: 성찰 기억에 대한 설정 (LLM이 생성한 요약 정보)
 [reflection]
+# 성찰 기억은 다른 기억 계층으로 이동하지 않습니다.
 importance_score_initialization = "sample"
 decay_params = {recency_factor=365.0, importance_factor=0.988}
 clean_up_threshold_dict = {recency_threshold=0.05, importance_threshold=5}
