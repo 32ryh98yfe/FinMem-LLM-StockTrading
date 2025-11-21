@@ -118,6 +118,22 @@ docker run -it --rm -v $(pwd):/finmem test-finmem bash
 
 This will enter the root folder of the project.
 
+### Run with Anaconda
+
+If you prefer to use Anaconda instead of Docker, you can set up the environment using the provided `environment.yml` file.
+
+1.  **Install Anaconda or Miniconda** if you haven't already.
+2.  **Create the environment**:
+    ```bash
+    conda env create -f environment.yml
+    ```
+3.  **Activate the environment**:
+    ```bash
+    conda activate finmem
+    ```
+
+Now you can run the program directly using `python`.
+
 ## Program
 
 The program has two main functionalities:

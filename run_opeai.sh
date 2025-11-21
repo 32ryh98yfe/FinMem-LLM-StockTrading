@@ -10,11 +10,11 @@ export OPENAI_API_KEY="Enter your OpenAI API Key here"
 # -et 2022-07-20 \
 # -rm train \
 # -cp config/tsla_gpt_config.toml \
-# -ckp /workspace/FinMem-LLM-StockTrading/data/06_train_checkpoint \
+# -ckp data/06_train_checkpoint \
 # -rp data/05_train_model_output
 # # train-checkpoint
 # python run.py sim-checkpoint \
-# -ckp /workspace/FinMem-LLM-StockTrading/data/06_train_checkpoint \
+# -ckp data/06_train_checkpoint \
 # -rp data/05_train_model_output \
 # -cp config/tsla_gpt_config.toml \
 # -rm train
